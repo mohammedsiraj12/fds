@@ -361,3 +361,54 @@ export async function getDoctorProfile(userId) {
 
   return { data, error };
 }
+// Message functions used by ConsultationChat component
+export async function sendConsultationMessage(
+  consultationId,
+  senderId,
+  senderRole,
+  messageText
+) {
+  const { data, error } = await supabase
+    .from(TABLES.MESSAGES)
+    .insert([
+      {
+        consultation_id: consultationId,
+        sender_id: senderId,
+        sender_role: senderRole,
+        message: messageText,
+        sent_at: new Date().toISOString(),
+      },
+    ])
+    .select();
+
+  return { data, error };
+}
+
+export async function getConsultationMessages(consultationId) {
+  const { data, error } = await supabase
+    .from(TABLES.MESSAGES)
+    .select('*')
+    .eq('consultation_id', consultationId)
+    .order('sent_at', { ascending: true });
+
+  return { data, error };
+}
+
+// Admin list helpers
+export async function getAllPatients() {
+  const { data, error } = await supabase
+    .from(TABLES.PATIENT_PROFILES)
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  return { data, error };
+}
+
+export async function getAllDoctors() {
+  const { data, error } = await supabase
+    .from(TABLES.DOCTOR_PROFILES)
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  return { data, error };
+}
