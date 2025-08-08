@@ -184,6 +184,14 @@ export async function uploadMedicalRecord(file, patientId, description = 'Medica
   }
 }
 
+// Helper to create a time-limited signed URL for viewing/downloading a medical record
+export async function getSignedMedicalRecordUrl(filePath, expiresInSeconds = 3600) {
+  const { data, error } = await supabase.storage
+    .from('medical-records')
+    .createSignedUrl(filePath, expiresInSeconds);
+  return { data, error };
+}
+
 // Get patient's medical records
 export async function getPatientMedicalRecords(patientId) {
   const { data, error } = await supabase
@@ -197,6 +205,33 @@ export async function getPatientMedicalRecords(patientId) {
 
 // Delete medical record
 export async function deleteMedicalRecord(recordId) {
+  // Fetch the record to get storage path
+  const { data: recordRows, error: fetchError } = await supabase
+    .from('medical_records')
+    .select('id, file_path')
+    .eq('id', recordId)
+    .limit(1);
+
+  if (fetchError) {
+    return { data: null, error: fetchError };
+  }
+
+  const record = Array.isArray(recordRows) ? recordRows[0] : recordRows;
+  if (!record) {
+    return { data: null, error: new Error('Record not found') };
+  }
+
+  // Remove file from storage (ignore missing file errors)
+  const { error: storageError } = await supabase.storage
+    .from('medical-records')
+    .remove([record.file_path]);
+
+  if (storageError && storageError.message && !/not found/i.test(storageError.message)) {
+    // If it's not a simple not-found, surface the error
+    return { data: null, error: storageError };
+  }
+
+  // Delete DB row
   const { data, error } = await supabase
     .from('medical_records')
     .delete()

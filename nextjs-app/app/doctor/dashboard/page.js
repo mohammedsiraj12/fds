@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { getDoctorConsultations, getDoctorAppointments, respondToConsultation, createDoctorProfile, getDoctorProfile, getAllPendingConsultations, getAllConsultations, getPatientMedicalRecords } from "../../../lib/database";
+import { getDoctorConsultations, getDoctorAppointments, respondToConsultation, createDoctorProfile, getDoctorProfile, getAllPendingConsultations, getAllConsultations, getPatientMedicalRecords, getSignedMedicalRecordUrl } from "../../../lib/database";
 
 export default function DoctorDashboard() {
   const [user, setUser] = useState(null);
@@ -244,21 +244,34 @@ export default function DoctorDashboard() {
                   Uploaded: {new Date(record.uploaded_at).toLocaleDateString()}
                 </p>
               </div>
-              <a
-                href={record.file_url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={async () => {
+                  try {
+                    const { data, error } = await getSignedMedicalRecordUrl(record.file_path, 60 * 10);
+                    if (error) {
+                      console.error('Error creating signed URL:', error);
+                      alert('Unable to open file right now.');
+                      return;
+                    }
+                    const url = data?.signedUrl || record.file_url;
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                  } catch (err) {
+                    console.error('Error opening file:', err);
+                    alert('Unable to open file right now.');
+                  }
+                }}
                 style={{
                   padding: '4px 8px',
                   background: '#007bff',
                   color: 'white',
-                  textDecoration: 'none',
+                  border: 'none',
                   borderRadius: '4px',
-                  fontSize: '12px'
+                  fontSize: '12px',
+                  cursor: 'pointer'
                 }}
               >
                 View PDF
-              </a>
+              </button>
             </div>
           </div>
         ))}
