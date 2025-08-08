@@ -172,18 +172,43 @@ export default function PatientDashboard() {
     router.push('/');
   };
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      setSelectedFile(file);
-      setFileDescription(file.name.replace('.pdf', ''));
-    } else {
-      setMessage("Please select a PDF file only.");
+  const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10MB
+  const isPdfSignature = async (file) => {
+    try {
+      const ab = await file.slice(0, 4).arrayBuffer();
+      const bytes = new Uint8Array(ab);
+      // '%PDF' signature
+      return bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+    } catch {
+      return false;
     }
   };
 
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    setMessage("");
+    if (!file) return;
+
+    const isPdfType = file.type === 'application/pdf';
+    const isPdfMagic = await isPdfSignature(file);
+    if (!isPdfType || !isPdfMagic) {
+      setSelectedFile(null);
+      setMessage("Invalid file. Please upload a valid PDF.");
+      return;
+    }
+
+    if (file.size > MAX_PDF_BYTES) {
+      setSelectedFile(null);
+      setMessage("File too large. Max size is 10MB.");
+      return;
+    }
+
+    setSelectedFile(file);
+    setFileDescription(file.name.replace(/\.pdf$/i, ''));
+  };
+
   const handleUploadMedicalRecord = async (e) => {
-    e.preventDefault();
+    if (e?.preventDefault) e.preventDefault();
     if (!selectedFile || !patientProfile) {
       setMessage("Please select a file to upload.");
       return;
@@ -191,12 +216,13 @@ export default function PatientDashboard() {
 
     setUploading(true);
     try {
-      const { data, error } = await uploadMedicalRecord(selectedFile, patientProfile.id, fileDescription);
+      const description = (fileDescription && fileDescription.trim()) || selectedFile.name.replace(/\.pdf$/i, '');
+      const { data, error } = await uploadMedicalRecord(selectedFile, patientProfile.id, description);
       if (error) {
         console.error("Error uploading medical record:", error);
         setMessage("Error uploading file: " + error.message);
       } else {
-        setMessage("Medical record uploaded successfully!");
+        setMessage("Medical record uploaded successfully! Doctors can now view it.");
         setSelectedFile(null);
         setFileDescription("");
         loadMedicalRecords(); // Reload the list
@@ -871,16 +897,8 @@ export default function PatientDashboard() {
               <div style={{ marginBottom: '20px' }}>
                 <input
                   type="file"
-                  accept=".pdf"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    if (file && file.type === 'application/pdf') {
-                      setSelectedFile(file);
-                      setMessage("File selected: " + file.name);
-                    } else {
-                      setMessage("Please select a PDF file only.");
-                    }
-                  }}
+                  accept="application/pdf,.pdf"
+                  onChange={handleFileSelect}
                   style={{ 
                     width: "100%", 
                     padding: '12px', 
@@ -898,32 +916,29 @@ export default function PatientDashboard() {
                   <p><strong>Type:</strong> {selectedFile.type}</p>
                 </div>
               )}
+
+              {selectedFile && (
+                <div style={{ marginBottom: '20px', maxWidth: '400px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    Description (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={fileDescription}
+                    onChange={(e) => setFileDescription(e.target.value)}
+                    placeholder="e.g., Blood Test Report Jan 2025"
+                    style={{
+                      width: "100%",
+                      padding: '12px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}
+                  />
+                </div>
+              )}
               
               <button 
-                onClick={async () => {
-                  if (!selectedFile || !patientProfile) {
-                    setMessage("Please select a file to upload.");
-                    return;
-                  }
-
-                  setUploading(true);
-                  try {
-                    const { data, error } = await uploadMedicalRecord(selectedFile, patientProfile.id, "Medical Record");
-                    if (error) {
-                      console.error("Error uploading medical record:", error);
-                      setMessage("Error uploading file: " + error.message);
-                    } else {
-                      setMessage("Medical record uploaded successfully! Doctors can now view it.");
-                      setSelectedFile(null);
-                      loadMedicalRecords(); // Reload the list
-                    }
-                  } catch (error) {
-                    console.error("Error in upload:", error);
-                    setMessage("Error uploading file: " + error.message);
-                  } finally {
-                    setUploading(false);
-                  }
-                }}
+                onClick={handleUploadMedicalRecord}
                 disabled={!selectedFile || uploading}
                 style={{
                   padding: '12px 24px',
