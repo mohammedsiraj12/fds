@@ -134,20 +134,33 @@ export async function getConsultationsToAutoClose() {
 // Upload medical record PDF
 export async function uploadMedicalRecord(file, patientId, description = 'Medical Record') {
   try {
-    // Upload file to Supabase Storage
-    const fileName = `medical_records/${patientId}/${Date.now()}_${file.name}`;
+    if (!file) {
+      throw new Error('No file provided');
+    }
+
+    // Build safe file path: {patientId}/medical_records/{timestamp}_{slug}.pdf
+    const originalName = (file.name || 'medical-record').toString();
+    const baseName = originalName.replace(/\.pdf$/i, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const safeFileName = `${Date.now()}_${baseName || 'medical-record'}.pdf`;
+    const filePath = `${patientId}/medical_records/${safeFileName}`;
+
+    // Upload file to Supabase Storage with correct content type
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('medical-records')
-      .upload(fileName, file);
+      .upload(filePath, file, {
+        contentType: 'application/pdf',
+        upsert: false,
+        cacheControl: '3600'
+      });
 
     if (uploadError) {
       throw uploadError;
     }
 
-    // Get public URL
+    // Get public URL from the correct bucket
     const { data: urlData } = supabase.storage
-      .from('medicalrecords')
-      .getPublicUrl(fileName);
+      .from('medical-records')
+      .getPublicUrl(filePath);
 
     // Save record to database
     const { data, error } = await supabase
@@ -155,9 +168,9 @@ export async function uploadMedicalRecord(file, patientId, description = 'Medica
       .insert([
         {
           patient_id: patientId,
-          file_name: file.name,
+          file_name: originalName,
           file_url: urlData.publicUrl,
-          file_path: fileName,
+          file_path: filePath,
           description: description,
           file_size: file.size,
           uploaded_at: new Date().toISOString()
