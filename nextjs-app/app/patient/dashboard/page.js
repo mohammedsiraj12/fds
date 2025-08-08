@@ -396,582 +396,524 @@ export default function PatientDashboard() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <div className="container" style={{ textAlign: 'center', marginTop: '50px' }}>
         Loading...
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: 20 }}>
+    <div className="container">
       {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '30px',
-        padding: '20px',
-        background: '#f8f9fa',
-        borderRadius: '8px'
-      }}>
-        <div>
-          <h1 style={{ color: '#28a745', margin: 0 }}>👤 Patient Dashboard</h1>
-          <p style={{ margin: '5px 0 0 0', color: '#666' }}>
-            Welcome back, {patientProfile?.full_name || user?.email?.split('@')[0]}
-          </p>
+      <div className="card" style={{ marginBottom: '30px' }}>
+        <div className="card-inner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 style={{ color: 'white', margin: 0 }}>👤 Patient Dashboard</h1>
+            <p style={{ margin: '5px 0 0 0', color: 'var(--muted)' }}>
+              Welcome back, {patientProfile?.full_name || user?.email?.split('@')[0]}
+            </p>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="btn btn-danger"
+          >
+            Logout
+          </button>
         </div>
-        <button 
-          onClick={handleLogout}
-          style={{ 
-            padding: '10px 20px', 
-            background: '#dc3545', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Logout
-        </button>
       </div>
 
       {/* Navigation Tabs */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '10px', 
-        marginBottom: '30px',
-        borderBottom: '1px solid #dee2e6',
-        flexWrap: 'wrap'
-      }}>
+      <div className="tabs" style={{ marginBottom: '24px' }}>
         <button
           onClick={() => setActiveTab("ask-question")}
-          style={{
-            padding: '12px 20px',
-            background: activeTab === "ask-question" ? '#28a745' : 'transparent',
-            color: activeTab === "ask-question" ? 'white' : '#28a745',
-            border: 'none',
-            borderRadius: '4px 4px 0 0',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
+          className={`tab-btn ${activeTab === "ask-question" ? 'active' : ''}`}
         >
           ❓ Ask Doctor
         </button>
         <button
           onClick={() => setActiveTab("appointments")}
-          style={{
-            padding: '12px 20px',
-            background: activeTab === "appointments" ? '#28a745' : 'transparent',
-            color: activeTab === "appointments" ? 'white' : '#28a745',
-            border: 'none',
-            borderRadius: '4px 4px 0 0',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
+          className={`tab-btn ${activeTab === "appointments" ? 'active' : ''}`}
         >
           📅 Book Appointment
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          style={{
-            padding: '12px 20px',
-            background: activeTab === "history" ? '#28a745' : 'transparent',
-            color: activeTab === "history" ? 'white' : '#28a745',
-            border: 'none',
-            borderRadius: '4px 4px 0 0',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
+          className={`tab-btn ${activeTab === "history" ? 'active' : ''}`}
         >
           📋 Medical History
         </button>
         <button
           onClick={() => setActiveTab("responses")}
-          style={{
-            padding: '12px 20px',
-            background: activeTab === "responses" ? '#28a745' : 'transparent',
-            color: activeTab === "responses" ? 'white' : '#28a745',
-            border: 'none',
-            borderRadius: '4px 4px 0 0',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
+          className={`tab-btn ${activeTab === "responses" ? 'active' : ''}`}
         >
           💬 Doctor Responses ({consultationsWithResponses.length})
         </button>
         <button
           onClick={() => setActiveTab("medical-records")}
-          style={{
-            padding: '12px 20px',
-            background: activeTab === "medical-records" ? '#28a745' : 'transparent',
-            color: activeTab === "medical-records" ? 'white' : '#28a745',
-            border: 'none',
-            borderRadius: '4px 4px 0 0',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
+          className={`tab-btn ${activeTab === "medical-records" ? 'active' : ''}`}
         >
           📄 Medical Records
         </button>
       </div>
 
       {/* Tab Content */}
-      <div style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-        {activeTab === "ask-question" && (
-          <div>
-            <h2>❓ Ask a Question to Doctor</h2>
-            <p style={{ color: '#666', marginBottom: '20px' }}>
-              Describe your symptoms and concerns. A doctor will respond within 24 hours.
-            </p>
-            
-            <form onSubmit={handleAskQuestion}>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  What's your main concern?
-                </label>
-                <textarea
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  placeholder="Describe your main health concern or question..."
-                  required
-                  style={{ 
-                    width: "100%", 
-                    padding: '12px', 
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    minHeight: '100px',
-                    resize: 'vertical'
-                  }}
-                />
-              </div>
+      <div className="card">
+        <div className="card-inner">
+          {activeTab === "ask-question" && (
+            <div>
+              <h2>❓ Ask a Question to Doctor</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '20px' }}>
+                Describe your symptoms and concerns. A doctor will respond within 24 hours.
+              </p>
               
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  Symptoms (if any)
-                </label>
-                <textarea
-                  value={symptoms}
-                  onChange={(e) => setSymptoms(e.target.value)}
-                  placeholder="List any symptoms you're experiencing..."
-                  required
-                  style={{ 
-                    width: "100%", 
-                    padding: '12px', 
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    minHeight: '80px',
-                    resize: 'vertical'
-                  }}
-                />
-              </div>
-              
-              <button 
-                type="submit"
-                style={{
-                  padding: '12px 24px',
-                  background: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
-              >
-                Submit Question
-              </button>
-            </form>
-          </div>
-        )}
-
-        {activeTab === "appointments" && (
-          <div>
-            <h2>📅 Book an Appointment</h2>
-            <p style={{ color: '#666', marginBottom: '20px' }}>
-              Schedule an appointment with our doctors.
-            </p>
-            
-            <form onSubmit={handleBookAppointment}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                <div>
+              <form onSubmit={handleAskQuestion}>
+                <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    Appointment Date
+                    What's your main concern?
                   </label>
-                  <input
-                    type="date"
-                    value={appointmentDate}
-                    onChange={(e) => setAppointmentDate(e.target.value)}
+                  <textarea
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    placeholder="Describe your main health concern or question..."
                     required
                     style={{ 
                       width: "100%", 
                       padding: '12px', 
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border)',
+                      background: 'var(--surface)',
+                      color: 'var(--text)',
+                      borderRadius: '10px',
+                      minHeight: '100px',
+                      resize: 'vertical'
                     }}
                   />
                 </div>
                 
-                <div>
+                <div style={{ marginBottom: '20px' }}>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    Preferred Time
+                    Symptoms (if any)
                   </label>
-                  <input
-                    type="time"
-                    value={appointmentTime}
-                    onChange={(e) => setAppointmentTime(e.target.value)}
+                  <textarea
+                    value={symptoms}
+                    onChange={(e) => setSymptoms(e.target.value)}
+                    placeholder="List any symptoms you're experiencing..."
                     required
                     style={{ 
                       width: "100%", 
                       padding: '12px', 
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border)',
+                      background: 'var(--surface)',
+                      color: 'var(--text)',
+                      borderRadius: '10px',
+                      minHeight: '80px',
+                      resize: 'vertical'
                     }}
                   />
                 </div>
-              </div>
-              
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  Appointment Type
-                </label>
-                <select
-                  value={appointmentType}
-                  onChange={(e) => setAppointmentType(e.target.value)}
-                  required
-                  style={{ 
-                    width: "100%", 
-                    padding: '12px', 
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
+                
+                <button 
+                  type="submit"
+                  style={{
+                    padding: '12px 24px',
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '16px'
                   }}
                 >
-                  <option value="general">General Checkup</option>
-                  <option value="consultation">Consultation</option>
-                  <option value="follow-up">Follow-up</option>
-                  <option value="emergency">Emergency</option>
-                </select>
-              </div>
-              
-              <button 
-                type="submit"
-                style={{
-                  padding: '12px 24px',
-                  background: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
-              >
-                Book Appointment
-              </button>
-            </form>
-
-            {/* Show existing appointments */}
-            {appointments.length > 0 && (
-              <div style={{ marginTop: '30px' }}>
-                <h3>Your Appointments</h3>
-                <div style={{ marginTop: '15px' }}>
-                  {appointments.map((appointment) => (
-                    <div key={appointment.id} style={{ 
-                      border: '1px solid #dee2e6', 
-                      borderRadius: '8px', 
-                      padding: '15px',
-                      marginBottom: '10px',
-                      background: '#f8f9fa'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <strong>{formatDate(appointment.appointment_date)} at {formatTime(appointment.appointment_time)}</strong>
-                          <p style={{ margin: '5px 0', color: '#666' }}>Type: {appointment.appointment_type}</p>
-                        </div>
-                        <span style={{ 
-                          padding: '4px 8px', 
-                          background: appointment.status === 'confirmed' ? '#28a745' : '#ffc107', 
-                          color: appointment.status === 'confirmed' ? 'white' : 'black', 
-                          borderRadius: '4px',
-                          fontSize: '12px'
-                        }}>
-                          {appointment.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "history" && (
-          <div>
-            <h2>📋 Medical History</h2>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-              gap: '20px',
-              marginTop: '20px'
-            }}>
-              <div style={{ 
-                border: '1px solid #dee2e6', 
-                borderRadius: '8px', 
-                padding: '20px',
-                background: '#f8f9fa'
-              }}>
-                <h3>🩺 Last Checkup</h3>
-                <p><strong>Date:</strong> January 15, 2024</p>
-                <p><strong>Doctor:</strong> Dr. Smith</p>
-                <p><strong>Diagnosis:</strong> Healthy, no issues</p>
-                <p><strong>Notes:</strong> Regular checkup completed successfully</p>
-              </div>
-              
-              <div style={{ 
-                border: '1px solid #dee2e6', 
-                borderRadius: '8px', 
-                padding: '20px',
-                background: '#f8f9fa'
-              }}>
-                <h3>💊 Current Medications</h3>
-                <p><strong>Vitamin D:</strong> 1000 IU daily</p>
-                <p><strong>Prescribed:</strong> January 10, 2024</p>
-                <p><strong>Duration:</strong> 3 months</p>
-              </div>
-              
-              <div style={{ 
-                border: '1px solid #dee2e6', 
-                borderRadius: '8px', 
-                padding: '20px',
-                background: '#f8f9fa'
-              }}>
-                <h3>🔬 Lab Results</h3>
-                <p><strong>Blood Test:</strong> December 20, 2023</p>
-                <p><strong>Status:</strong> <span style={{ color: '#28a745' }}>Normal</span></p>
-                <p><strong>Cholesterol:</strong> 180 mg/dL</p>
-                <p><strong>Blood Sugar:</strong> 95 mg/dL</p>
-              </div>
+                  Submit Question
+                </button>
+              </form>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === "responses" && (
-          <div>
-            <h2>💬 Doctor Responses</h2>
-            {consultationsWithResponses.length === 0 ? (
-              <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                <p style={{ color: '#666' }}>
-                  No doctor responses yet. Ask a question to get started!
-                </p>
-                <div style={{ marginTop: '10px', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}>
-                  <p><strong>Debug Info:</strong></p>
-                  <p>Total consultations: {consultations.length}</p>
-                  <p>Consultations with responses: {consultationsWithResponses.length}</p>
-                  <p>Check browser console for detailed logs.</p>
+          {activeTab === "appointments" && (
+            <div>
+              <h2>📅 Book an Appointment</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '20px' }}>
+                Schedule an appointment with our doctors.
+              </p>
+              
+              <form onSubmit={handleBookAppointment}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                      Appointment Date
+                    </label>
+                    <input
+                      type="date"
+                      value={appointmentDate}
+                      onChange={(e) => setAppointmentDate(e.target.value)}
+                      required
+                      style={{ 
+                        width: "100%", 
+                        padding: '12px', 
+                        border: '1px solid var(--border)',
+                        background: 'var(--surface)',
+                        color: 'var(--text)',
+                        borderRadius: '10px'
+                      }}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                      Preferred Time
+                    </label>
+                    <input
+                      type="time"
+                      value={appointmentTime}
+                      onChange={(e) => setAppointmentTime(e.target.value)}
+                      required
+                      style={{ 
+                        width: "100%", 
+                        padding: '12px', 
+                        border: '1px solid var(--border)',
+                        background: 'var(--surface)',
+                        color: 'var(--text)',
+                        borderRadius: '10px'
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div style={{ marginTop: '20px' }}>
-                {consultationsWithResponses.map((consultation) => (
-                  <div key={consultation.id} style={{ 
-                    border: '2px solid #007bff', 
-                    borderRadius: '8px', 
-                    padding: '20px',
-                    marginBottom: '15px',
-                    background: '#f8f9fa'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <h4 style={{ color: '#007bff', margin: 0 }}>{getDoctorName(consultation)}</h4>
-                      <div style={{ display: 'flex', gap: '10px' }}>
-                        {!isConsultationClosed(consultation) && !isConsultationExpired(consultation) && (
-                          <button
-                            onClick={() => setSelectedConsultation(consultation)}
-                            style={{
-                              padding: '6px 12px',
-                              background: '#28a745',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              fontSize: '12px'
-                            }}
-                          >
-                            Continue Chat
-                          </button>
-                        )}
-                        {!isConsultationClosed(consultation) && (
-                          <button
-                            onClick={() => handleCloseConsultation(consultation.id)}
-                            style={{
-                              padding: '6px 12px',
-                              background: '#6c757d',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              fontSize: '12px'
-                            }}
-                          >
-                            Close Chat
-                          </button>
-                        )}
-                        {(isConsultationClosed(consultation) || isConsultationExpired(consultation)) && (
+                
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    Appointment Type
+                  </label>
+                  <select
+                    value={appointmentType}
+                    onChange={(e) => setAppointmentType(e.target.value)}
+                    required
+                    style={{ 
+                      width: "100%", 
+                      padding: '12px', 
+                      border: '1px solid var(--border)',
+                      background: 'var(--surface)',
+                      color: 'var(--text)',
+                      borderRadius: '10px'
+                    }}
+                  >
+                    <option value="general">General Checkup</option>
+                    <option value="consultation">Consultation</option>
+                    <option value="follow-up">Follow-up</option>
+                    <option value="emergency">Emergency</option>
+                  </select>
+                </div>
+                
+                <button 
+                  type="submit"
+                  style={{
+                    padding: '12px 24px',
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '16px'
+                  }}
+                >
+                  Book Appointment
+                </button>
+              </form>
+
+              {/* Show existing appointments */}
+              {appointments.length > 0 && (
+                <div style={{ marginTop: '30px' }}>
+                  <h3>Your Appointments</h3>
+                  <div style={{ marginTop: '15px' }}>
+                    {appointments.map((appointment) => (
+                      <div key={appointment.id} style={{ 
+                        border: '1px solid var(--border)', 
+                        background: 'var(--surface)',
+                        borderRadius: '10px', 
+                        padding: '15px',
+                        marginBottom: '10px',
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <strong>{formatDate(appointment.appointment_date)} at {formatTime(appointment.appointment_time)}</strong>
+                            <p style={{ margin: '5px 0', color: 'var(--muted)' }}>Type: {appointment.appointment_type}</p>
+                          </div>
                           <span style={{ 
                             padding: '4px 8px', 
-                            background: '#6c757d', 
-                            color: 'white', 
+                            background: appointment.status === 'confirmed' ? '#28a745' : '#ffc107', 
+                            color: appointment.status === 'confirmed' ? 'white' : 'black', 
                             borderRadius: '4px',
                             fontSize: '12px'
                           }}>
-                            {isConsultationClosed(consultation) ? 'Closed' : 'Expired'}
+                            {appointment.status}
                           </span>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div style={{ marginBottom: '15px' }}>
-                      <p style={{ fontWeight: 'bold', color: '#333' }}><strong>Your Question:</strong> {consultation.question}</p>
-                      {consultation.symptoms && (
-                        <p style={{ color: '#666' }}><strong>Symptoms:</strong> {consultation.symptoms}</p>
-                      )}
-                    </div>
-                    
-                    {consultation.response && (
-                      <div style={{ 
-                        marginBottom: '15px', 
-                        padding: '15px', 
-                        background: '#e3f2fd', 
-                        borderRadius: '8px',
-                        border: '1px solid #2196f3'
-                      }}>
-                        <strong style={{ color: '#1976d2' }}>Doctor's Response:</strong>
-                        <p style={{ margin: '8px 0 0 0', color: '#333', fontSize: '16px' }}>{consultation.response}</p>
-                      </div>
-                    )}
-                    
-                    {consultation.follow_up_response && (
-                      <div style={{ 
-                        marginBottom: '15px', 
-                        padding: '15px', 
-                        background: consultation.follow_up_from_patient ? '#fff3e0' : '#e8f5e8', 
-                        borderRadius: '8px',
-                        border: `1px solid ${consultation.follow_up_from_patient ? '#ff9800' : '#4caf50'}`
-                      }}>
-                        <strong style={{ color: consultation.follow_up_from_patient ? '#e65100' : '#2e7d32' }}>
-                          {consultation.follow_up_from_patient ? 'Your Follow-up:' : 'Doctor\'s Follow-up:'}
-                        </strong>
-                        <p style={{ margin: '8px 0 0 0', color: '#333', fontSize: '16px' }}>{consultation.follow_up_response}</p>
-                      </div>
-                    )}
-                    
-                    <p style={{ color: '#666', fontSize: '14px', marginTop: '10px' }}>
-                      Answered {formatDate(consultation.answered_at || consultation.created_at)}
-                    </p>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === "medical-records" && (
-          <div>
-            <h2>📄 Medical Records</h2>
-            <p style={{ color: '#666', marginBottom: '20px' }}>
-              Upload your medical records (PDF files) to help doctors better understand your medical history. This is optional but helpful.
-            </p>
-            
-            <div style={{ 
-              border: '2px dashed #ddd', 
-              borderRadius: '8px', 
-              padding: '30px', 
-              textAlign: 'center',
-              marginBottom: '30px',
-              background: '#f8f9fa'
-            }}>
-              <div style={{ fontSize: '48px', marginBottom: '15px' }}>📄</div>
-              <h3>Upload Medical Records</h3>
-              <p style={{ color: '#666', marginBottom: '20px' }}>
-                Supported format: PDF files only<br/>
-                Maximum file size: 10MB per file
-              </p>
-              
-              <div style={{ marginBottom: '20px' }}>
-                <input
-                  type="file"
-                  accept="application/pdf,.pdf"
-                  onChange={handleFileSelect}
-                  style={{ 
-                    width: "100%", 
-                    padding: '12px', 
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    maxWidth: '400px'
-                  }}
-                />
-              </div>
-              
-              {selectedFile && (
-                <div style={{ marginBottom: '20px', padding: '15px', background: '#e8f5e8', borderRadius: '8px' }}>
-                  <p><strong>Selected File:</strong> {selectedFile.name}</p>
-                  <p><strong>Size:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
-                  <p><strong>Type:</strong> {selectedFile.type}</p>
                 </div>
               )}
+            </div>
+          )}
 
-              {selectedFile && (
-                <div style={{ marginBottom: '20px', maxWidth: '400px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    Description (optional)
-                  </label>
+          {activeTab === "history" && (
+            <div>
+              <h2>📋 Medical History</h2>
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
+                gap: '20px',
+                marginTop: '20px'
+              }}>
+                <div style={{ 
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface)',
+                  borderRadius: '10px', 
+                  padding: '20px',
+                }}>
+                  <h3>🩺 Last Checkup</h3>
+                  <p><strong>Date:</strong> January 15, 2024</p>
+                  <p><strong>Doctor:</strong> Dr. Smith</p>
+                  <p><strong>Diagnosis:</strong> Healthy, no issues</p>
+                  <p><strong>Notes:</strong> Regular checkup completed successfully</p>
+                </div>
+                
+                <div style={{ 
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface)',
+                  borderRadius: '10px', 
+                  padding: '20px',
+                }}>
+                  <h3>💊 Current Medications</h3>
+                  <p><strong>Vitamin D:</strong> 1000 IU daily</p>
+                  <p><strong>Prescribed:</strong> January 10, 2024</p>
+                  <p><strong>Duration:</strong> 3 months</p>
+                </div>
+                
+                <div style={{ 
+                  border: '1px solid var(--border)',
+                  background: 'var(--surface)',
+                  borderRadius: '10px', 
+                  padding: '20px',
+                }}>
+                  <h3>🔬 Lab Results</h3>
+                  <p><strong>Blood Test:</strong> December 20, 2023</p>
+                  <p><strong>Status:</strong> <span style={{ color: '#28a745' }}>Normal</span></p>
+                  <p><strong>Cholesterol:</strong> 180 mg/dL</p>
+                  <p><strong>Blood Sugar:</strong> 95 mg/dL</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "responses" && (
+            <div>
+              <h2>💬 Doctor Responses</h2>
+              {consultationsWithResponses.length === 0 ? (
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                  <p style={{ color: 'var(--muted)' }}>
+                    No doctor responses yet. Ask a question to get started!
+                  </p>
+                  <div style={{ marginTop: '10px', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}>
+                    <p><strong>Debug Info:</strong></p>
+                    <p>Total consultations: {consultations.length}</p>
+                    <p>Consultations with responses: {consultationsWithResponses.length}</p>
+                    <p>Check browser console for detailed logs.</p>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ marginTop: '20px' }}>
+                  {consultationsWithResponses.map((consultation) => (
+                    <div key={consultation.id} style={{ 
+                      border: '2px solid #007bff', 
+                      borderRadius: '8px', 
+                      padding: '20px',
+                      marginBottom: '15px',
+                      background: '#f8f9fa'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <h4 style={{ color: '#007bff', margin: 0 }}>{getDoctorName(consultation)}</h4>
+                        <div style={{ display: 'flex', gap: '10px' }}>
+                          {!isConsultationClosed(consultation) && !isConsultationExpired(consultation) && (
+                            <button
+                              onClick={() => setSelectedConsultation(consultation)}
+                              style={{
+                                padding: '6px 12px',
+                                background: '#28a745',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px'
+                              }}
+                            >
+                              Continue Chat
+                            </button>
+                          )}
+                          {!isConsultationClosed(consultation) && (
+                            <button
+                              onClick={() => handleCloseConsultation(consultation.id)}
+                              style={{
+                                padding: '6px 12px',
+                                background: '#6c757d',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px'
+                              }}
+                            >
+                              Close Chat
+                            </button>
+                          )}
+                          {(isConsultationClosed(consultation) || isConsultationExpired(consultation)) && (
+                            <span style={{ 
+                              padding: '4px 8px', 
+                              background: '#6c757d', 
+                              color: 'white', 
+                              borderRadius: '4px',
+                              fontSize: '12px'
+                            }}>
+                              {isConsultationClosed(consultation) ? 'Closed' : 'Expired'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div style={{ marginBottom: '15px' }}>
+                        <p style={{ fontWeight: 'bold', color: '#333' }}><strong>Your Question:</strong> {consultation.question}</p>
+                        {consultation.symptoms && (
+                          <p style={{ color: '#666' }}><strong>Symptoms:</strong> {consultation.symptoms}</p>
+                        )}
+                      </div>
+                      
+                      {consultation.response && (
+                        <div style={{ 
+                          marginBottom: '15px', 
+                          padding: '15px', 
+                          background: '#e3f2fd', 
+                          borderRadius: '8px',
+                          border: '1px solid #2196f3'
+                        }}>
+                          <strong style={{ color: '#1976d2' }}>Doctor's Response:</strong>
+                          <p style={{ margin: '8px 0 0 0', color: '#333', fontSize: '16px' }}>{consultation.response}</p>
+                        </div>
+                      )}
+                      
+                      {consultation.follow_up_response && (
+                        <div style={{ 
+                          marginBottom: '15px', 
+                          padding: '15px', 
+                          background: consultation.follow_up_from_patient ? '#fff3e0' : '#e8f5e8', 
+                          borderRadius: '8px',
+                          border: `1px solid ${consultation.follow_up_from_patient ? '#ff9800' : '#4caf50'}`
+                        }}>
+                          <strong style={{ color: consultation.follow_up_from_patient ? '#e65100' : '#2e7d32' }}>
+                            {consultation.follow_up_from_patient ? 'Your Follow-up:' : 'Doctor\'s Follow-up:'}
+                          </strong>
+                          <p style={{ margin: '8px 0 0 0', color: '#333', fontSize: '16px' }}>{consultation.follow_up_response}</p>
+                        </div>
+                      )}
+                      
+                      <p style={{ color: '#666', fontSize: '14px', marginTop: '10px' }}>
+                        Answered {formatDate(consultation.answered_at || consultation.created_at)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "medical-records" && (
+            <div>
+              <h2>📄 Medical Records</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '20px' }}>
+                Upload your medical records (PDF files) to help doctors better understand your medical history.
+              </p>
+              
+              <div className="upload-zone" style={{ marginBottom: '24px' }}>
+                <div style={{ fontSize: '48px', marginBottom: '15px' }}>📄</div>
+                <h3>Upload Medical Records</h3>
+                <p style={{ color: 'var(--muted)', marginBottom: '20px' }}>
+                  Supported format: PDF files only<br/>
+                  Maximum file size: 10MB per file
+                </p>
+                
+                <div style={{ marginBottom: '20px' }}>
                   <input
-                    type="text"
-                    value={fileDescription}
-                    onChange={(e) => setFileDescription(e.target.value)}
-                    placeholder="e.g., Blood Test Report Jan 2025"
-                    style={{
-                      width: "100%",
-                      padding: '12px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    onChange={handleFileSelect}
+                    style={{ 
+                      width: "100%", 
+                      padding: '12px', 
+                      border: '1px solid var(--border)',
+                      background: 'var(--surface)',
+                      color: 'var(--text)',
+                      borderRadius: '10px',
+                      maxWidth: '400px'
                     }}
                   />
                 </div>
-              )}
-              
-              <button 
-                onClick={handleUploadMedicalRecord}
-                disabled={!selectedFile || uploading}
-                style={{
-                  padding: '12px 24px',
-                  background: selectedFile ? '#28a745' : '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: selectedFile ? 'pointer' : 'not-allowed',
-                  fontSize: '16px'
-                }}
-              >
-                {uploading ? 'Uploading...' : 'Upload Medical Record'}
-              </button>
+                
+                {selectedFile && (
+                  <div className="card" style={{ marginBottom: '20px' }}>
+                    <div className="card-inner">
+                      <p><strong>Selected File:</strong> {selectedFile.name}</p>
+                      <p style={{ color: 'var(--muted)' }}><strong>Size:</strong> {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                      <p style={{ color: 'var(--muted)' }}><strong>Type:</strong> {selectedFile.type}</p>
+                    </div>
+                  </div>
+                )}
+
+                {selectedFile && (
+                  <div style={{ marginBottom: '20px', maxWidth: '400px' }}>
+                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                      Description (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={fileDescription}
+                      onChange={(e) => setFileDescription(e.target.value)}
+                      placeholder="e.g., Blood Test Report Jan 2025"
+                      style={{
+                        width: "100%",
+                        padding: '12px',
+                        border: '1px solid var(--border)',
+                        background: 'var(--surface)',
+                        color: 'var(--text)',
+                        borderRadius: '10px'
+                      }}
+                    />
+                  </div>
+                )}
+                
+                <button 
+                  onClick={handleUploadMedicalRecord}
+                  disabled={!selectedFile || uploading}
+                  className={`btn btn-primary`}
+                  style={{ opacity: !selectedFile || uploading ? 0.6 : 1 }}
+                >
+                  {uploading ? 'Uploading...' : 'Upload Medical Record'}
+                </button>
+              </div>
+
+              {/* tips card retains style but benefits from theme */}
+              <div className="card">
+                <div className="card-inner">
+                  <h4>💡 Tips for Medical Records</h4>
+                  <ul style={{ textAlign: 'left', margin: '10px 0', color: 'var(--muted)' }}>
+                    <li>Upload recent lab results, X-rays, or medical reports</li>
+                    <li>Include medication lists and allergy information</li>
+                    <li>Add previous diagnosis and treatment history</li>
+                    <li>Include vaccination records if relevant</li>
+                    <li>Make sure files are clear and readable</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-            
-            <div style={{ 
-              background: '#fff3cd', 
-              border: '1px solid #ffeaa7', 
-              borderRadius: '8px', 
-              padding: '20px',
-              marginTop: '20px'
-            }}>
-              <h4>💡 Tips for Medical Records</h4>
-              <ul style={{ textAlign: 'left', margin: '10px 0' }}>
-                <li>Upload recent lab results, X-rays, or medical reports</li>
-                <li>Include medication lists and allergy information</li>
-                <li>Add previous diagnosis and treatment history</li>
-                <li>Include vaccination records if relevant</li>
-                <li>Make sure files are clear and readable</li>
-              </ul>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Follow-up Modal */}
@@ -1060,17 +1002,7 @@ export default function PatientDashboard() {
       )}
 
       {message && (
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '15px',
-          background: message.includes("successfully") || message.includes("submitted") ? '#28a745' : '#dc3545',
-          color: 'white',
-          borderRadius: '4px',
-          textAlign: 'center',
-          fontWeight: 'bold',
-          fontSize: '16px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-        }}>
+        <div className={`alert ${message.includes("successfully") || message.includes("submitted") ? 'alert-success' : 'alert-error'}`} style={{ marginTop: 20 }}>
           {message}
         </div>
       )}
