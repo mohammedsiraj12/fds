@@ -36,6 +36,7 @@ app.include_router(password_reset.router)
 app.include_router(messages.router)
 app.include_router(health.router)
 app.include_router(files.router)
+app.include_router(video_conference.router)
 
 if __name__ == "__main__":
     import uvicorn
